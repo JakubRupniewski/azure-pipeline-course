@@ -25,15 +25,16 @@ stages:
       inputs:
         restoreSolution: '$(solution)'
 
-    - task: replacetokens@3
+    - task: replacetokens@4
       inputs:
         targetFiles: '**/*.cshtml'
         encoding: 'auto'
+        tokenPattern: 'default'
         writeBOM: true
         actionOnMissing: 'warn'
         keepToken: false
-        tokenPrefix: '#{'
-        tokenSuffix: '}#'
+        actionOnNoFiles: 'continue'
+        enableTransforms: false
         useLegacyPattern: false
         enableTelemetry: true
 
@@ -60,7 +61,7 @@ stages:
   - job: PublishTheCode
     steps:
 
-    - task: DownloadBuildArtifacts@0
+    - task: DownloadBuildArtifacts@1
       inputs:
         buildType: 'current'
         downloadType: 'single'
@@ -70,21 +71,21 @@ stages:
     - task: AzureResourceManagerTemplateDeployment@3
       inputs:
         deploymentScope: 'Resource Group'
-        azureResourceManagerConnection: '[REPLACE WITH YOUR AZURE SUBSCRIPTION]'
-        subscriptionId: '[YOUR AZURE SUBSCRIPTION ID]'
+        azureResourceManagerConnection: 'Azure Pass - Sponsorship(76e39b1c-85df-4441-aa6b-7af4148ca19d)'
+        subscriptionId: '76e39b1c-85df-4441-aa6b-7af4148ca19d'
         action: 'Create Or Update Resource Group'
-        resourceGroupName: 'lz-yaml'
-        location: 'Central US'
+        resourceGroupName: 'PipelineCourse'
+        location: 'North Europe'
         templateLocation: 'Linked artifact'
-        csmFile: '$(System.ArtifactsDirectory)/**/WebAppWithSlots-Windows.json'
-        csmParametersFile: '$(System.ArtifactsDirectory)/**/azuredeploy.parameters.json'
-        overrideParameters: '-appName bnkYAML'
+        csmFile: '$(System.ArtifactsDirectory)/WebAppWithSlots-Windows.json'
+        csmParametersFile: '$(System.ArtifactsDirectory)/azuredeploy.parameters.json'
+        overrideParameters: '-appName pipelineCourse'
         deploymentMode: 'Incremental'
-
+    
     - task: AzureRmWebAppDeployment@4
       inputs:
         ConnectionType: 'AzureRM'
-        azureSubscription: '[REPLACE WITH YOUR AZURE SUBSCRIPTION]'
+        azureSubscription: 'Azure Pass - Sponsorship(76e39b1c-85df-4441-aa6b-7af4148ca19d)'
         appType: 'webApp'
-        WebAppName: 'bnkYAML'
+        WebAppName: 'pipelineCourse'
         packageForLinux: '$(System.ArtifactsDirectory)/**/*.zip'
